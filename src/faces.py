@@ -4,6 +4,7 @@ import pickle
 
 face_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_frontalface_alt2.xml')
 eye_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_eye.xml')
+eyeglasses_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_eye_tree_eyeglasses.xml')
 smile_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_smile.xml')
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -28,10 +29,10 @@ while True:
 
         # recognize? deep learned model predict keras tensorflow pytorch scikit learn
         id_, conf = recognizer.predict(roi_gray)
-        print("confidence", conf)
-        if 45 <= conf <= 85:
+        if 50 <= conf <= 100:
             # print(id_)
-            print(labels[id_])
+            print(labels[id_], end=' ')
+            print("confidence", conf)
             font = cv2.FONT_HERSHEY_SIMPLEX
             name = labels[id_]
             color = (255, 255, 255)
@@ -46,9 +47,15 @@ while True:
         end_cord_x = x + w
         end_cord_y = y + h
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke)
+
         eyes = eye_cascade.detectMultiScale(roi_gray)
         for (ex, ey, ew, eh) in eyes:
             cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
+
+        eyeglasses = eyeglasses_cascade.detectMultiScale(roi_gray)
+        for (egx, egy, egw, egh) in eyeglasses:
+            cv2.rectangle(roi_color, (egx, egy), (egx+egw, egy+egh), (0, 255, 0), 2)
+
         smile = smile_cascade.detectMultiScale(roi_gray)
         for (sx, sy, sw, sh) in smile:
             cv2.rectangle(roi_color, (sx, sy), (sx+sw, sy+sh), (0, 255, 0), 2)
